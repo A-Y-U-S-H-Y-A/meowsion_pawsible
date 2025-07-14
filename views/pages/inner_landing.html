@@ -1,0 +1,1118 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Responsive Dashboard</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://cdn.jsdelivr.net/npm/nouislider@15.7.1/dist/nouislider.min.css" rel="stylesheet">
+
+
+  <style>
+    .pill {
+      transition: all 0.2s ease;
+    }
+
+    .pill:hover {
+      cursor: pointer;
+    }
+
+    .noUi-connect {
+      background: #fb923c;
+    }
+
+    .noUi-horizontal .noUi-handle {
+      background: white;
+      border: 2px solid #fb923c;
+      box-shadow: 0 0 4px rgba(0, 0, 0, 0.2);
+    }
+  </style>
+</head>
+
+<body class="bg-gray-100 h-screen overflow-hidden">
+
+  <!-- Header -->
+<header class="bg-white text-slate-800 border-b border-gray-200 px-6 py-4 shadow-sm">
+  <div class="max-w-7xl mx-auto flex items-center justify-between">
+
+    <!-- Left Side: Logo & Menu Button -->
+    <div class="flex items-center gap-4">
+      <button id="menuBtn" class="md:hidden text-2xl hover:text-yellow-500 transition">
+        ☰
+      </button>
+      <a href="/" class="flex items-center gap-2">
+        <img src="/logo.svg" alt="Meowsion Pawsible" class="h-8 w-auto">
+      </a>
+    </div>
+
+    <!-- Right Side: Buttons -->
+    <div class="flex items-center gap-4 text-lg">
+      <button id="openPreferencesModal" title="Preferences" class="hover:text-yellow-500 transition">
+        ⭐
+      </button>
+      <a href="/onboarding" title="Profile" class="hover:text-yellow-500 transition">
+        👤
+      </a>
+      <a href="/logout" class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-sm transition">
+        LOG OUT
+      </a>
+    </div>
+  </div>
+</header>
+
+
+
+  <!-- Layout -->
+  <div class="flex flex-col md:flex-row h-[calc(100vh-60px)]">
+
+    <!-- Sidebar -->
+    <aside id="sidebar"
+      class="w-full md:w-[300px] bg-white shadow-md flex flex-col justify-between md:translate-x-0 transform -translate-x-full md:transform-none transition-transform duration-300 fixed md:relative z-20 md:z-auto h-full md:h-auto">
+      <!-- Tabs -->
+      <div>
+        <div class="flex justify-around border-b">
+          <button id="profileTab" class="w-1/2 text-center py-3 font-semibold text-orange-500 border-orange-500"> Your
+            Posts </button>
+          <button id="messageTab"
+            class="w-1/2 text-center py-3 font-semibold text-gray-600 hover:text-orange-500 border-orange-500">Requests</button>
+        </div>
+        <div id="tabContent"
+          class="overflow-y-auto h-[calc(100vh-140px)] md:h-[calc(100vh-120px)] text-sm space-y-3 text-gray-800 px-4">
+          <!-- Dynamic -->
+        </div>
+      </div>
+    </aside>
+
+    <!-- Overlay for mobile -->
+    <div id="overlay" class="fixed inset-0 bg-black bg-opacity-50 z-10 hidden md:hidden"></div>
+
+    <!-- Main Tinder UI -->
+    <section class="flex-1 relative bg-gray-100">
+      <div id="cardContainer" class="h-full flex justify-center text-center px-4 pt-4 overflow-auto">
+
+        <!-- Dynamic -->
+      </div>
+      <!-- Bottom Nav (mobile only) -->
+      <nav class="md:hidden fixed bottom-0 left-0 w-full bg-white flex justify-around py-2 shadow-inner border-t">
+        <button id="rejectBtnMobile" class="text-blue-500 text-xl">❌</button>
+        <button id="adoptBtnMobile" class="text-pink-500 text-xl">🐾</button>
+      </nav>
+      <!-- Bottom Buttons (desktop) -->
+      <div class="hidden md:flex absolute bottom-6 left-1/2 transform -translate-x-1/2 space-x-6">
+        <button id="rejectBtn"
+          class="bg-white text-blue-500 text-2xl w-14 h-14 rounded-full shadow hover:scale-110 transition">❌</button>
+        <button id="adoptBtn"
+          class="bg-white text-pink-500 text-2xl w-14 h-14 rounded-full shadow hover:scale-110 transition">🐾</button>
+      </div>
+    </section>
+  </div>
+
+
+
+
+
+  <!-- Preferences Modal -->
+  <div id="preferencesModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+    <div class="bg-white w-full max-w-3xl max-h-[90vh] overflow-y-auto rounded-lg shadow-lg p-6 relative">
+      <button id="closePreferencesModal"
+        class="absolute top-3 right-4 text-gray-500 hover:text-black text-xl">✖</button>
+      <section class="flex w-full">
+        <div class="w-full">
+          <div class="flex justify-center">
+            <img src="logo.svg" alt="Meowsion Pawsible" class="h-10" />
+          </div>
+          <h2 class="text-xl font-semibold text-center text-gray-800 mb-4">Your Pet Preferences</h2>
+          <!-- Form will be dynamically handled by script -->
+          <form id="preferencesForm" class="space-y-4">
+
+            <!-- Species -->
+            <div class="mt-6">
+              <div class="flex justify-between items-center mb-1">
+                <label class="text-sm font-medium text-gray-700">Preferred Species</label>
+                <button type="button" class="text-xs text-orange-500 hover:underline"
+                  onclick="clearGroup('isDog')">Clear</button>
+              </div>
+              <div class="flex flex-wrap gap-2" data-group="isDog">
+                <button type="button" data-value="true" class="pill">Dog</button>
+                <button type="button" data-value="false" class="pill">Cat</button>
+              </div>
+            </div>
+
+            <!-- Gender -->
+            <div class="mt-6">
+              <div class="flex justify-between items-center mb-1">
+                <label class="text-sm font-medium text-gray-700">Gender Preference</label>
+                <button type="button" class="text-xs text-orange-500 hover:underline"
+                  onclick="clearGroup('isMale')">Clear</button>
+              </div>
+              <div class="flex flex-wrap gap-2" data-group="isMale">
+                <button type="button" data-value="true" class="pill">Male</button>
+                <button type="button" data-value="false" class="pill">Female</button>
+              </div>
+            </div>
+
+            <!-- Adoption / Fostering -->
+            <div class="mt-6">
+              <div class="flex justify-between items-center mb-1">
+                <label class="text-sm font-medium text-gray-700">You're open to</label>
+                <button type="button" class="text-xs text-orange-500 hover:underline"
+                  onclick="clearGroup('isAdopt')">Clear</button>
+              </div>
+              <div class="flex flex-wrap gap-2" data-group="isAdopt">
+                <button type="button" data-key="adopt" class="pill">Adoption</button>
+                <button type="button" data-key="foster" class="pill">Fostering</button>
+              </div>
+            </div>
+
+            <!-- Breed -->
+            <div class="mt-6">
+              <div class="flex justify-between items-center mb-1">
+                <label class="text-sm font-medium text-gray-700">Preferred Breed</label>
+                <button type="button" class="text-xs text-orange-500 hover:underline"
+                  onclick="document.getElementById('breed').value=''">Clear</button>
+              </div>
+              <input type="text" id="breed" placeholder="e.g. Labrador, Persian"
+                class="w-full px-4 py-3 rounded-md border border-gray-300 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-orange-400" />
+            </div>
+
+            <!-- Health & Care -->
+            <div class="mt-6">
+              <div class="flex justify-between items-center mb-1">
+                <label class="text-sm font-medium text-gray-700">Health & Care Preferences</label>
+                <button type="button" class="text-xs text-orange-500 hover:underline"
+                  onclick="clearGroup('booleanPrefs')">Clear</button>
+              </div>
+              <div class="space-y-4" data-group="booleanPrefs">
+                <div>
+                  <label class="block text-sm font-medium text-gray-600 mb-1">Vaccinated</label>
+                  <div class="flex gap-2" data-pref="vaccinated">
+                    <button type="button" class="pill" data-value="true">Yes</button>
+                    <button type="button" class="pill" data-value="false">No</button>
+                    <button type="button" class="pill" data-value="null">No Preference</button>
+                  </div>
+                </div>
+                <div>
+                  <label class="block text-sm font-medium text-gray-600 mb-1">Spayed/Neutered</label>
+                  <div class="flex gap-2" data-pref="spayed">
+                    <button type="button" class="pill" data-value="true">Yes</button>
+                    <button type="button" class="pill" data-value="false">No</button>
+                    <button type="button" class="pill" data-value="null">No Preference</button>
+                  </div>
+                </div>
+                <div>
+                  <label class="block text-sm font-medium text-gray-600 mb-1">Open to Special Needs</label>
+                  <div class="flex gap-2" data-pref="specialNeeds">
+                    <button type="button" class="pill" data-value="true">Yes</button>
+                    <button type="button" class="pill" data-value="false">No</button>
+                    <button type="button" class="pill" data-value="null">No Preference</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Age Range -->
+            <div class="mt-6">
+              <div class="flex justify-between items-center mb-1">
+                <label class="text-sm font-medium text-gray-700">Preferred Age Range</label>
+                <button type="button" class="text-xs text-orange-500 hover:underline"
+                  onclick="resetAgeSlider()">Reset</button>
+              </div>
+              <div id="ageSlider" class="mt-3"></div>
+              <div class="flex justify-between text-sm text-gray-600 mt-1">
+                <span id="ageMinLabel">1 month</span>
+                <span id="ageMaxLabel">25 years</span>
+              </div>
+            </div>
+
+            <p id="errorText" class="text-sm text-red-600 hidden"></p>
+
+            <div class="flex justify-between">
+              <button type="button" onclick="clearAll()" class="text-sm text-orange-500 underline">Clear All</button>
+              <button type="submit"
+                class="bg-orange-500 hover:bg-orange-600 text-white py-3 px-6 rounded-md font-semibold transition duration-200">Save
+                Preferences</button>
+            </div>
+          </form>
+        </div>
+      </section>
+    </div>
+  </div>
+
+
+  <!-- Modal -->
+  <div id="customModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+    <div class="bg-white rounded-xl shadow-lg max-w-sm w-full p-6">
+      <div id="modalMessage" class="text-gray-800 text-sm mb-4">This is a message.</div>
+      <div class="flex justify-end">
+        <button id="modalClose"
+          class="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-md text-sm font-medium">
+          OK
+        </button>
+      </div>
+    </div>
+  </div>
+
+
+
+
+
+
+  <script src="https://cdn.jsdelivr.net/npm/nouislider@15.7.1/dist/nouislider.min.js"></script>
+  <script>
+    function showModal(message) {
+      const modal = document.getElementById("customModal");
+      const modalMessage = document.getElementById("modalMessage");
+      const modalClose = document.getElementById("modalClose");
+
+      modalMessage.innerText = message;
+      modal.classList.remove("hidden");
+      modal.classList.add("flex");
+
+      function close() {
+        modal.classList.add("hidden");
+        modal.classList.remove("flex");
+        modalClose.removeEventListener("click", close);
+      }
+
+      modalClose.addEventListener("click", close);
+    }
+
+    document.getElementById("openPreferencesModal").addEventListener("click", () => {
+      document.getElementById("preferencesModal").classList.remove("hidden");
+    });
+
+    document.getElementById("closePreferencesModal").addEventListener("click", () => {
+      document.getElementById("preferencesModal").classList.add("hidden");
+    });
+
+    const pillClass = "px-4 py-2 rounded-full border border-orange-400 text-orange-500 bg-white hover:bg-orange-100";
+    const selectedClass = "px-4 py-2 rounded-full border border-orange-500 text-white bg-orange-500";
+
+    function applySelectedStyle(btn) {
+      btn.classList.remove("bg-white", "text-orange-500", "hover:bg-orange-100");
+      btn.classList.add("bg-orange-500", "text-white", "selected");
+    }
+
+    function clearSelectedStyle(btn) {
+      btn.classList.remove("bg-orange-500", "text-white", "selected");
+      btn.classList.add("bg-white", "text-orange-500", "hover:bg-orange-100");
+    }
+
+    // Multi-select logic (Dog/Cat etc.)
+    document.querySelectorAll('[data-group="isDog"] .pill, [data-group="isMale"] .pill, [data-group="isAdopt"] .pill').forEach(btn => {
+      btn.className = "pill " + pillClass;
+      btn.addEventListener("click", () => {
+        if (btn.classList.contains("selected")) {
+          clearSelectedStyle(btn);
+        } else {
+          applySelectedStyle(btn);
+        }
+      });
+    });
+
+    // Tri-option logic (Vaccinated/Spayed/etc.)
+    document.querySelectorAll('[data-group="booleanPrefs"] [data-pref]').forEach(group => {
+      const buttons = group.querySelectorAll(".pill");
+      buttons.forEach(btn => {
+        btn.className = "pill " + pillClass;
+        btn.addEventListener("click", () => {
+          const isSelected = btn.classList.contains("selected");
+          buttons.forEach(clearSelectedStyle);
+          if (!isSelected) {
+            applySelectedStyle(btn);
+          }
+        });
+      });
+    });
+
+    function clearGroup(group) {
+      document.querySelectorAll(`[data-group="${group}"] .pill`).forEach(clearSelectedStyle);
+    }
+
+    function clearAll() {
+      document.querySelectorAll(".pill").forEach(clearSelectedStyle);
+      document.getElementById("breed").value = "";
+      resetAgeSlider();
+    }
+
+    const slider = document.getElementById("ageSlider");
+    const ageMinLabel = document.getElementById("ageMinLabel");
+    const ageMaxLabel = document.getElementById("ageMaxLabel");
+
+    noUiSlider.create(slider, {
+      start: [1, 300],
+      connect: true,
+      step: 1,
+      range: {
+        min: 1,
+        max: 300
+      }
+    });
+
+    function formatMonths(m) {
+      const y = Math.floor(m / 12);
+      const rem = m % 12;
+      if (y === 0) return `${rem} month${rem > 1 ? "s" : ""}`;
+      if (rem === 0) return `${y} year${y > 1 ? "s" : ""}`;
+      return `${y} yr ${rem} mo`;
+    }
+
+    slider.noUiSlider.on('update', function (values) {
+      const [min, max] = values.map(v => Math.round(v));
+      ageMinLabel.textContent = formatMonths(min);
+      ageMaxLabel.textContent = formatMonths(max);
+    });
+
+    function resetAgeSlider() {
+      slider.noUiSlider.set([1, 300]);
+    }
+
+    function getTriOptionPrefs(groupSelector) {
+      const result = {};
+      document.querySelectorAll(`${groupSelector} [data-pref]`).forEach(group => {
+        const key = group.dataset.pref;
+        const selected = group.querySelector(".selected");
+        result[key] = selected ? (selected.dataset.value === "true" ? true : selected.dataset.value === "false" ? false : null) : null;
+      });
+      return result;
+    }
+
+    document.getElementById("preferencesForm").addEventListener("submit", async function (e) {
+      e.preventDefault();
+
+      const getSelectedValues = (group) => {
+        return Array.from(document.querySelectorAll(`[data-group="${group}"] .selected`)).map(btn =>
+          btn.dataset.value === "true" ? true : btn.dataset.value === "false" ? false : null
+        );
+      };
+
+      const getSelectedKeys = (group) => {
+        return Array.from(document.querySelectorAll(`[data-group="${group}"] .selected`)).map(btn => btn.dataset.key);
+      };
+
+      const isDogVals = getSelectedValues("isDog");
+      const isMaleVals = getSelectedValues("isMale");
+      const adoptKeys = getSelectedKeys("isAdopt");
+
+      const isDog = isDogVals.length === 1 ? isDogVals[0] : null;
+      const isMale = isMaleVals.length === 1 ? isMaleVals[0] : null;
+      let isAdopt = null;
+      if (adoptKeys.length === 1) {
+        isAdopt = adoptKeys[0] === "adopt" ? true : false;
+      }
+
+      const boolPrefs = getTriOptionPrefs('[data-group="booleanPrefs"]');
+      const [ageMin, ageMax] = slider.noUiSlider.get().map(v => Math.round(v));
+
+      const payload = {
+        isDog,
+        isMale,
+        isAdopt,
+        breed: document.getElementById("breed").value.trim() || null,
+        vaccinated: boolPrefs.vaccinated,
+        spayed: boolPrefs.spayed,
+        specialNeeds: boolPrefs.specialNeeds,
+        ageMin,
+        ageMax,
+      };
+
+      const breedRegex = /^[a-zA-Z\s\-]{2,50}$/;
+      if (payload.breed && !breedRegex.test(payload.breed)) {
+        return showError("Invalid breed. Use 2–50 letters, spaces or dashes.");
+      }
+
+      showModal("Saving preferences...");
+
+      try {
+        const res = await fetch("/preferences", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        });
+
+        const data = await res.json();
+        if (res.ok) {
+          showModal(data.message || "Preferences saved!");
+          window.location.href = "/home";
+        } else {
+          showError(data?.error || "Something went wrong.");
+        }
+      } catch (err) {
+        console.error(err);
+        showError("Network error.");
+      }
+    });
+
+    function showError(msg) {
+      const errorText = document.getElementById("errorText");
+      errorText.textContent = msg;
+      errorText.classList.remove("hidden");
+    }
+  </script>
+
+
+  <script>
+    let currentImageIndex = 0;
+    let currentCard = 0;
+    let animalCards = [];
+    let cardIndex = 0;
+    let done = false;
+
+
+
+    async function loadMoreCards() {
+      if (done) return;
+
+      try {
+        const res = await fetch('/cards');
+        const data = await res.json();
+
+        if (!Array.isArray(data.cards)) throw new Error("Invalid response");
+
+        if (data.cards.length === 0) {
+          done = true;
+          return;
+        }
+
+        animalCards = animalCards.concat(data.cards);
+      } catch (err) {
+        console.error("Failed to fetch cards:", err);
+      }
+    }
+
+
+    async function renderMessages() {
+      const tab = document.getElementById("tabContent");
+      tab.innerHTML = `<div class="text-center text-gray-400 py-4">Loading messages...</div>`;
+
+      try {
+        const response = await fetch("/messages");
+        const data = await response.json();
+
+        if (!data.messages || data.messages.length === 0) {
+          tab.innerHTML = `<div class="text-center text-gray-400 py-4">No adoption requests found.</div>`;
+          return;
+        }
+
+        // Split messages into incoming and outgoing
+        const incoming = data.messages.filter(m => m.direction === "incoming");
+        const outgoing = data.messages.filter(m => m.direction === "outgoing");
+
+        const renderCard = (msg, isIncoming = true) => `
+      <div class="bg-white shadow-md rounded-lg border overflow-hidden">
+        <div class="flex justify-between items-start p-4 gap-2">
+          <div class="w-0 min-w-0 flex-1">
+            <div class="text-lg font-semibold text-gray-800 break-words">${isIncoming ? msg.from : "You"}</div>
+            <div class="text-xs text-gray-400 mt-1">${msg.time}</div>
+          </div>
+          ${isIncoming
+            ? `<button onclick="viewDetails(${msg.id_from}, ${msg.animalID})" 
+                class="text-blue-600 hover:text-blue-800 transition text-sm shrink-0 whitespace-nowrap">
+                View User
+              </button>`
+            : `<div class="text-sm font-medium px-2 py-1 rounded ${msg.status === true ? 'bg-green-100 text-green-700' : msg.status === false ? 'bg-red-100 text-red-700' : 'bg-yellow-100 text-yellow-700'}"> ${msg.status === true ? 'Accepted' : msg.status === false ? 'Rejected' : 'Pending'} </div>`
+          }
+        </div>
+        <div class="px-4 pb-4 text-sm text-gray-700">${msg.message}</div>
+        ${isIncoming
+            ? `<div class="flex divide-x border-t">
+                <button onclick="interactRequest(${msg.id_from}, ${msg.animalID}, 'accept')"
+                        class="w-1/2 py-2 text-green-600 hover:bg-green-50 transition text-sm font-medium">
+                  ✅ Accept
+                </button>
+                <button onclick="interactRequest(${msg.id_from}, ${msg.animalID}, 'reject')"
+                        class="w-1/2 py-2 text-red-600 hover:bg-red-50 transition text-sm font-medium">
+                  ❌ Reject
+                </button>
+              </div>`
+            : ""
+          }
+      </div>`;
+
+        tab.innerHTML = `
+      <div class='p-1'></div>
+      ${incoming.length ? `<h2 class="text-sm font-semibold text-gray-500 pl-1">Requests For Your Animals</h2>` : ""}
+      <div class="space-y-4 mb-6">${incoming.map(msg => renderCard(msg, true)).join('')}</div>
+      ${outgoing.length ? `<h2 class="text-sm font-semibold text-gray-500 pl-1">Requests You Made</h2>` : ""}
+      <div class="space-y-4">${outgoing.map(msg => renderCard(msg, false)).join('')}</div>
+    `;
+
+      } catch (err) {
+        tab.innerHTML = `<div class="text-center text-red-500 py-4">Failed to load adoption requests.</div>`;
+        console.error("Error fetching messages:", err);
+      }
+    }
+
+
+
+    function capitalize(str) {
+      if (!str) return 'N/A';
+      return str.charAt(0).toUpperCase() + str.slice(1);
+    }
+
+    // Placeholder: customize this as needed to open modal or redirect
+    function viewDetails(userId, animalId) {
+      const tab = document.getElementById("tabContent");
+      tab.innerHTML = `<div class="text-center text-gray-400 py-4">Loading user details...</div>`;
+
+      fetch('/user/details', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: userId })
+      })
+        .then(res => res.json())
+        .then(data => {
+          if (data.error) {
+            tab.innerHTML = `<div class="text-red-600 py-4 text-center">${data.error}</div>`;
+            return;
+          }
+
+          const user = data.user;
+          const details = user.UserDetail;
+
+          tab.innerHTML = `
+        <button onclick="renderMessages()" class="text-sm text-blue-600 hover:underline my-4 inline-block">← Back to Requests</button>
+
+        <div class="bg-white p-5 rounded shadow space-y-3 text-sm">
+          <h2 class="text-xl font-semibold mb-4 text-gray-800">User Details</h2>
+          <div><strong>Name:</strong> ${user.name || 'N/A'}</div>
+          <div><strong>City:</strong> ${capitalize(details?.city) || 'N/A'}</div>
+          <div><strong>State:</strong> ${capitalize(details?.state) || 'N/A'}</div>
+          <div><strong>Country:</strong> ${capitalize(details?.country) || 'N/A'}</div>
+          <div>
+  <strong>WhatsApp Number:</strong> 
+  ${details?.whatsappNumber || 'N/A'}
+  ${details?.whatsappNumber ? `<a href="https://wa.me/${details.whatsappExt.replace('+', '')}${details.whatsappNumber.replace('+', '')}" target="_blank" class="text-green-600 hover:underline ml-2">📩 Chat</a>` : ''}
+</div>
+
+          <div><strong>Has Pets:</strong> ${details?.hasPets ? 'Yes' : 'No'}</div>
+        </div>
+
+        <div class="mt-6 flex gap-4">
+          <button onclick="interactRequest(${userId}, ${animalId}, 'accept')" class="w-1/2 py-3 bg-green-100 text-green-700 rounded font-medium hover:bg-green-200 transition">✅ Accept</button>
+          <button onclick="interactRequest(${userId}, ${animalId}, 'reject')" class="w-1/2 py-3 bg-red-100 text-red-700 rounded font-medium hover:bg-red-200 transition">❌ Reject</button>
+        </div>
+      `;
+        })
+        .catch(err => {
+          tab.innerHTML = `<div class="text-red-600 py-4 text-center">Failed to fetch user details.</div>`;
+          console.error("Fetch error:", err);
+        });
+    }
+
+
+
+
+
+    async function renderProfile() {
+      const tab = document.getElementById("tabContent");
+
+      tab.innerHTML = `
+    <div class="sticky top-0 bg-white pb-2 z-10">
+      <div class="flex justify-center pt-2">
+        <a href="/adoption" class="bg-orange-500 text-white text-l px-4 py-2 w-full rounded shadow hover:scale-105 transition text-center block">
+          + Add Adoption
+        </a>
+      </div>
+    </div>
+    <div id="adoptionList" class="space-y-4 mt-4 text-gray-400 text-center">Loading adoptions...</div>
+  `;
+
+      try {
+        const response = await fetch("/animal");
+        const data = await response.json();
+
+        const list = document.getElementById("adoptionList");
+
+        if (!data.adoptions || data.adoptions.length === 0) {
+          list.innerHTML = `<div class="py-4">No adoptions found.</div>`;
+          return;
+        }
+
+        const now = new Date();
+
+        list.innerHTML = data.adoptions.map(pet => {
+          let canBoost = true;
+
+          if (pet.boost) {
+            const boostDate = new Date(pet.boost);
+            const diffTime = now.getTime() - boostDate.getTime();
+            const diffDays = diffTime / (1000 * 60 * 60 * 24);
+            canBoost = diffDays >= 30;
+          }
+
+          if (pet.status) {
+            canBoost = false; // Boosting not allowed for adopted pets
+          }
+
+          return `
+        <div class="relative p-4 border rounded shadow-sm bg-white group">
+          <div class="flex justify-between items-start">
+            <div>
+              <div class="font-semibold text-gray-800 text-left">${pet.name}</div>
+              <div class="text-xs text-gray-500">${pet.status ? 'Adopted' : 'Pending'} • ${pet.date}</div>
+            </div>
+
+            <div class="relative">
+              <button onclick="toggleMenu(this)" class="text-gray-500 hover:text-gray-800 p-1">
+                ⋮
+              </button>
+              <div class="hidden absolute right-0 mt-2 w-40 bg-white border rounded shadow z-10 menu-options">
+                <button onclick="editAnimal(${pet.id})" class="block w-full text-left px-4 py-2 hover:bg-gray-100 text-sm">✏️ Edit</button>
+                <button onclick="changeStatus(${pet.id}, '${pet.name}', ${pet.status}, this)" class="block w-full text-left px-4 py-2 hover:bg-gray-100 text-sm">🔄 Change Status</button>
+                ${canBoost ? `
+                  <button onclick="boostAnimal(${pet.id}, this)" class="block w-full text-left px-4 py-2 hover:bg-gray-100 text-sm">🚀 Boost</button>
+                ` : ''}
+                <button onclick="deleteAnimal(${pet.id}, this)" class="block w-full text-left px-4 py-2 text-red-600 hover:bg-red-100 text-sm">🗑️ Delete</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+        }).join('');
+
+      } catch (err) {
+        const list = document.getElementById("adoptionList");
+        list.innerHTML = `<div class="text-red-500 py-4">Failed to load adoptions.</div>`;
+        console.error("Error fetching adoptions:", err);
+      }
+    }
+
+
+
+    async function boostAnimal(id, el) {
+      const originalHTML = el.innerHTML;
+      el.disabled = true;
+      el.innerHTML = `🚀 Boosting...`;
+
+      try {
+        const res = await fetch("/boost", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({ id })
+        });
+
+        const data = await res.json();
+
+        if (!res.ok) {
+          showModal(data.error || "Failed to boost animal.");
+          return;
+        }
+
+        showModal(data.message || "Animal boosted successfully!");
+        renderProfile(); // Refresh the list
+      } catch (err) {
+        console.error("Boost failed:", err);
+        showModal("An error occurred while boosting.");
+      } finally {
+        el.disabled = false;
+        el.innerHTML = originalHTML;
+      }
+    }
+
+
+
+    function toggleMenu(button) {
+      document.querySelectorAll(".menu-options").forEach(m => m.classList.add("hidden")); // hide others
+      const menu = button.nextElementSibling;
+      menu.classList.toggle("hidden");
+
+      // Optional: click outside to close
+      document.addEventListener("click", function handler(e) {
+        if (!menu.contains(e.target) && e.target !== button) {
+          menu.classList.add("hidden");
+          document.removeEventListener("click", handler);
+        }
+      });
+    }
+
+    function editAnimal(id) {
+      window.location.href = `/animal/edit/${id}`;
+    }
+
+    function changeStatus(id, name = "this animal", currentStatus, buttonElement = null) {
+      // Remove any existing dropdowns
+      document.querySelectorAll(".status-dropdown").forEach(e => e.remove());
+
+      // Create dropdown
+      const dropdown = document.createElement("div");
+      dropdown.className = "status-dropdown absolute right-0 mt-2 w-40 bg-white border rounded shadow z-50";
+      dropdown.innerHTML = `
+    <div class="px-3 py-2 text-sm text-gray-600 border-b">Set status for <b>${name}</b></div>
+    <button class="w-full text-left px-4 py-2 text-sm hover:bg-gray-100 ${!currentStatus ? 'bg-gray-50' : ''}"
+            onclick="submitStatusChange(${id}, 0)">🟢 Available</button>
+    <button class="w-full text-left px-4 py-2 text-sm hover:bg-gray-100 ${currentStatus ? 'bg-gray-50' : ''}"
+            onclick="submitStatusChange(${id}, 1)">✅ Adopted</button>
+    <button class="w-full text-left px-4 py-2 text-red-600 hover:bg-red-100 text-sm" onclick="this.parentElement.remove()">Cancel</button>
+  `;
+
+      // Position near the clicked button
+      if (buttonElement) {
+        buttonElement.parentElement.style.position = "relative";
+        buttonElement.parentElement.appendChild(dropdown);
+      } else {
+        document.body.appendChild(dropdown);
+      }
+
+      // Optional: Close when clicking outside
+      document.addEventListener("click", function handler(e) {
+        if (!dropdown.contains(e.target) && e.target !== buttonElement) {
+          dropdown.remove();
+          document.removeEventListener("click", handler);
+        }
+      });
+    }
+
+    function submitStatusChange(id, status) {
+      showModal("Updating status...");
+      fetch('/animal/status', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id, adopted: status })
+      }).then(res => {
+        if (res.ok) {
+          showModal("Status updated.");
+          renderProfile(); // Refresh the list
+        } else {
+          showModal("Failed to update status.");
+        }
+      }).catch(err => {
+        console.error("Status update error:", err);
+        showModal("Network error.");
+      });
+
+      // Remove dropdown immediately after action
+      document.querySelectorAll(".status-dropdown").forEach(e => e.remove());
+    }
+
+
+    function deleteAnimal(id, btn) {
+
+      if (!confirm("Are you sure you want to delete this post?")) return;
+      showModal("Deleting animal...");
+      fetch('/animal/delete', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: id })  // Explicitly ensure ID is passed as a number
+      }).then(res => {
+        if (res.ok) {
+          showModal("Animal deleted.");
+          renderProfile(); // Refresh the posts
+        } else {
+          showModal("Failed to delete animal.");
+        }
+      }).catch(err => {
+        console.error("Delete failed:", err);
+        showModal("Network error.");
+      });
+    }
+
+
+
+
+
+    function renderCard() {
+      const container = document.getElementById("cardContainer");
+      const pet = animalCards[0];
+
+      if (!pet) {
+        container.innerHTML = `<div class='text-gray-400 text-xl pt-10'>No more animals available right now.</div>`;
+        return;
+      }
+
+      const birthDate = new Date(pet.birthday);
+      const today = new Date();
+
+      let years = today.getFullYear() - birthDate.getFullYear();
+      let months = today.getMonth() - birthDate.getMonth();
+
+      // Adjust if birth month hasn't occurred yet this year
+      if (months < 0) {
+        years--;
+        months += 12;
+      }
+
+      const ageString = `${years > 0 ? years + " year" + (years > 1 ? "s" : "") : ""}${years && months ? " " : ""}${months > 0 ? months + " month" + (months > 1 ? "s" : "") : ""}`;
+      console.log(ageString);
+
+      const pill = (label) =>
+        `<span class="inline-block px-3 py-1 rounded-full border border-orange-400 text-orange-500 text-xs bg-white">${label}</span>`;
+
+      const images = pet.image;
+      const activeImage = images[currentImageIndex];
+
+      const progressDots = images.length > 1
+        ? images.map((_, i) =>
+          `<div class="h-1 rounded-full ${i === currentImageIndex ? 'bg-orange-500 w-6' : 'bg-gray-300 w-2'} transition-all"></div>`
+        ).join('')
+        : '';
+
+
+      container.innerHTML = `
+  <div class="bg-white w-full max-w-4xl md:h-[72vh] rounded-xl shadow-xl overflow-hidden flex flex-col md:flex-row">
+    
+    <!-- Image Side -->
+    <div class="w-full md:w-1/2 aspect-square md:aspect-auto relative md:sticky md:top-0">
+      <div class="relative w-full h-full">
+        <img src="/images/${activeImage}" class="w-full h-full object-cover" alt="${pet.name}">
+        ${images.length > 1
+          ? `<div class="absolute top-2 left-0 right-0 px-6 flex justify-center gap-1 z-10">
+              ${progressDots}
+            </div>` : ''
+        }
+        ${images.length > 1
+          ? `<div class="absolute inset-0 flex justify-between items-center text-white text-2xl z-10">
+              <div class="w-1/2 h-full cursor-pointer" id="prevImage"></div>
+              <div class="w-1/2 h-full cursor-pointer" id="nextImage"></div>
+            </div>` : ''
+        }
+      </div>
+    </div>
+
+    <!-- Content Side -->
+    <div class="w-full md:w-1/2 overflow-y-auto p-5 space-y-3 text-left text-sm text-gray-800">
+      <h2 class="text-2xl font-semibold text-gray-900">${pet.name}</h2>
+      <p>${pet.bio}</p>
+      <div class="flex flex-wrap gap-2">
+        ${pill(pet.isDog ? "Dog" : "Cat")}
+        ${pill(pet.isMale ? "Male" : "Female")}
+        ${pill(`${ageString}`)}
+        ${pill(pet.house ? "Adoption" : "Fostering")}
+      </div>
+      <div class="text-sm text-gray-600">
+        <span class="block"><strong>Breed:</strong> ${pet.breed}</span>
+        <span class="block"><strong>Location:</strong> ${pet.location}</span>
+      </div>
+      <div class="flex flex-wrap gap-2">
+        ${pet.isVaccinated ? pill("Vaccinated") : ""}
+        ${pet.isSpayed ? pill("Spayed/Neutered") : ""}
+        ${pet.specialneeds ? `<div class="flex items-start gap-2"><span class="font-medium text-gray-700">🆘 Special Needs:</span><span class="text-sm text-red-600">${pet.SN}</span></div>` : ""}
+      </div>
+      <div class="h-24 md:h-6"></div>
+    </div>
+  </div>
+`;
+
+
+      // Image navigation
+      const prev = document.getElementById("prevImage");
+      const next = document.getElementById("nextImage");
+
+      if (prev) {
+        prev.onclick = () => {
+          if (currentImageIndex > 0) {
+            currentImageIndex--;
+            renderCard();
+          }
+        };
+      }
+
+      if (next) {
+        next.onclick = () => {
+          if (currentImageIndex < images.length - 1) {
+            currentImageIndex++;
+            renderCard();
+          }
+        };
+      }
+
+      setupSwipeListeners();
+
+    }
+
+    function animateSwipe(direction) {
+      const card = document.querySelector("#cardContainer > div");
+      if (!card) return;
+
+      card.style.transition = "transform 0.3s ease-out, opacity 0.3s ease-out";
+      card.style.transform = `translateX(${direction === "right" ? '100vw' : '-100vw'})`;
+      card.style.opacity = "0";
+
+      setTimeout(() => {
+        nextCard();
+      }, 300);
+    }
+
+    async function registerInteraction(id, action) {
+      try {
+        await fetch('/interact', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ id, action }) // action = 'adopt' or 'reject'
+        });
+      } catch (err) {
+        console.error(`Failed to register ${action}:`, err);
+      }
+    }
+
+    async function interactRequest(userid, animalid, action) {
+      showModal(`Processing ${action} request...`);
+      try {
+        const response = await fetch('/msg_request', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ userid, animalid, action })
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+          showModal(data.message);
+
+          // Remove the card from the messages list if it's present
+          const allCards = document.querySelectorAll('#tabContent > .space-y-4 > div');
+          allCards.forEach(card => {
+            if (card.innerHTML.includes(`interactRequest(${userid}, ${animalid}, 'accept'`) ||
+              card.innerHTML.includes(`interactRequest(${userid}, ${animalid}, 'reject'`)) {
+              card.remove();
+            }
+          });
+
+          if (action === 'accept') {
+            allCards.forEach(card => {
+              if (card.innerHTML.includes(`interactRequest(`) && card.innerHTML.includes(`, ${animalid},`)) {
+                card.remove();
+              }
+            });
+          }
+
+          // If we're in the user details view, return to the main messages list
+          const backToRequestsBtn = document.querySelector('button[onclick^="renderMessages"]');
+          if (backToRequestsBtn) {
+            renderMessages();
+          }
+
+        } else {
+          showModal(`Error: ${data.message || 'Something went wrong'}`);
+        }
+
+      } catch (err) {
+        console.error(`Failed to register ${action}:`, err);
+        showModal('Network error. Please try again later.');
+      }
+    }
+
+
+
+
+    async function adopt() {
+      const pet = animalCards[currentCard];
+      if (!pet) return;
+      showModal(`You have adopted ${pet.name}!`);
+      await registerInteraction(pet.id, 'adopt');
+      animateSwipe("right");
+    }
+
+    async function reject() {
+      const pet = animalCards[currentCard];
+      if (!pet) return;
+      showModal(`You have rejected ${pet.name}.`);
+      await registerInteraction(pet.id, 'reject');
+      animateSwipe("left");
+    }
+
+
+
+    function setupSwipeListeners() {
+      const card = document.querySelector("#cardContainer > div");
+      if (!card) return;
+
+      let touchStartX = 0;
+      let touchEndX = 0;
+
+      card.addEventListener('touchstart', (e) => {
+        touchStartX = e.changedTouches[0].screenX;
+      });
+
+      card.addEventListener('touchend', (e) => {
+        touchEndX = e.changedTouches[0].screenX;
+        handleSwipeGesture();
+      });
+
+      function handleSwipeGesture() {
+        const deltaX = touchEndX - touchStartX;
+        const threshold = 50;
+
+        if (Math.abs(deltaX) > threshold) {
+          if (deltaX > 0) {
+            adopt();
+          } else {
+            reject();
+          }
+        }
+      }
+    }
+
+
+    async function nextCard() {
+      // Remove the top card
+      if (animalCards.length > 0) {
+        animalCards.splice(0, 1);
+      }
+
+      // If we're out of cards, try loading more
+      if (animalCards.length === 0 && !done) {
+        await loadMoreCards();
+      }
+
+      // Show next card or "no more"
+      currentImageIndex = 0;
+      renderCard();
+    }
+
+
+
+
+    document.getElementById("profileTab").addEventListener("click", () => {
+      document.getElementById("profileTab").classList.add("text-orange-500", "border-orange-500");
+      document.getElementById("messageTab").classList.remove("text-orange-500", "border-orange-500");
+      renderProfile();
+
+      const addBtn = document.getElementById("addAdoptionButton");
+      if (addBtn) addBtn.classList.remove("hidden");
+    });
+
+    document.getElementById("messageTab").addEventListener("click", () => {
+      document.getElementById("messageTab").classList.add("text-orange-500", "border-orange-500");
+      document.getElementById("profileTab").classList.remove("text-orange-500", "border-orange-500");
+      renderMessages();
+
+      const addBtn = document.getElementById("addAdoptionButton");
+      if (addBtn) addBtn.classList.add("hidden");
+    });
+
+
+    ["rejectBtn", "rejectBtnMobile"].forEach(id => {
+      document.getElementById(id).addEventListener("click", reject);
+    });
+
+    ["adoptBtn", "adoptBtnMobile"].forEach(id => {
+      document.getElementById(id).addEventListener("click", adopt);
+    });
+
+
+    document.getElementById("menuBtn").addEventListener("click", () => {
+      document.getElementById("sidebar").classList.toggle("-translate-x-full");
+      document.getElementById("overlay").classList.toggle("hidden");
+    });
+    document.getElementById("overlay").addEventListener("click", () => {
+      document.getElementById("sidebar").classList.add("-translate-x-full");
+      document.getElementById("overlay").classList.add("hidden");
+    });
+
+    // Initial
+    // Initial
+    renderProfile();
+
+    (async () => {
+      await loadMoreCards();
+      renderCard();
+    })();
+
+  </script>
+</body>
+
+</html>

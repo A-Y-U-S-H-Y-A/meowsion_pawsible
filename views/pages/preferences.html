@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Pet Preferences</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/nouislider@15.7.1/dist/nouislider.min.css" rel="stylesheet" />
+    <style>
+        .pill {
+            transition: all 0.2s ease;
+        }
+
+        .pill:hover {
+            cursor: pointer;
+        }
+
+        .noUi-connect {
+            background: #fb923c;
+        }
+
+        .noUi-horizontal .noUi-handle {
+            background: white;
+            border: 2px solid #fb923c;
+            box-shadow: 0 0 4px rgba(0, 0, 0, 0.2);
+        }
+    </style>
+</head>
+
+<body class="bg-gray-50">
+<section class="flex min-h-screen overflow-y-auto">
+    <div class="min-h-screen flex items-center justify-center px-4 mx-auto">
+        <div class="bg-white text-gray-900 w-full max-w-xl md:max-w-2xl p-8 rounded-lg shadow-lg space-y-6">
+            <div class="flex justify-center">
+                <img src="logo.svg" alt="Meowsion Pawsible" class="h-10" />
+            </div>
+
+            <h2 class="text-xl font-semibold text-center text-gray-800">Your Pet Preferences</h2>
+
+<form id="preferencesForm" class="space-y-4">
+
+                <!-- Species -->
+                <div class="mt-6">
+                    <div class="flex justify-between items-center mb-1">
+                        <label class="text-sm font-medium text-gray-700">Preferred Species</label>
+                        <button type="button" class="text-xs text-orange-500 hover:underline" onclick="clearGroup('isDog')">Clear</button>
+                    </div>
+                    <div class="flex flex-wrap gap-2" data-group="isDog">
+                        <button type="button" data-value="true" class="pill">Dog</button>
+                        <button type="button" data-value="false" class="pill">Cat</button>
+                    </div>
+                </div>
+
+                <!-- Gender -->
+                <div class="mt-6">
+                    <div class="flex justify-between items-center mb-1">
+                        <label class="text-sm font-medium text-gray-700">Gender Preference</label>
+                        <button type="button" class="text-xs text-orange-500 hover:underline" onclick="clearGroup('isMale')">Clear</button>
+                    </div>
+                    <div class="flex flex-wrap gap-2" data-group="isMale">
+                        <button type="button" data-value="true" class="pill">Male</button>
+                        <button type="button" data-value="false" class="pill">Female</button>
+                    </div>
+                </div>
+
+                <!-- Adoption / Fostering -->
+                <div class="mt-6">
+                    <div class="flex justify-between items-center mb-1">
+                        <label class="text-sm font-medium text-gray-700">You're open to</label>
+                        <button type="button" class="text-xs text-orange-500 hover:underline" onclick="clearGroup('isAdopt')">Clear</button>
+                    </div>
+                    <div class="flex flex-wrap gap-2" data-group="isAdopt">
+                        <button type="button" data-key="adopt" class="pill">Adoption</button>
+                        <button type="button" data-key="foster" class="pill">Fostering</button>
+                    </div>
+                </div>
+
+                <!-- Breed -->
+                <div class="mt-6">
+                    <div class="flex justify-between items-center mb-1">
+                        <label class="text-sm font-medium text-gray-700">Preferred Breed</label>
+                        <button type="button" class="text-xs text-orange-500 hover:underline" onclick="document.getElementById('breed').value=''">Clear</button>
+                    </div>
+                    <input type="text" id="breed" placeholder="e.g. Labrador, Persian"
+                        class="w-full px-4 py-3 rounded-md border border-gray-300 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-orange-400" />
+                </div>
+
+                <!-- Health & Care -->
+                <div class="mt-6">
+                    <div class="flex justify-between items-center mb-1">
+                        <label class="text-sm font-medium text-gray-700">Health & Care Preferences</label>
+                        <button type="button" class="text-xs text-orange-500 hover:underline" onclick="clearGroup('booleanPrefs')">Clear</button>
+                    </div>
+                    <div class="space-y-4" data-group="booleanPrefs">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-600 mb-1">Vaccinated</label>
+                            <div class="flex gap-2" data-pref="vaccinated">
+                                <button type="button" class="pill" data-value="true">Yes</button>
+                                <button type="button" class="pill" data-value="false">No</button>
+                                <button type="button" class="pill" data-value="null">No Preference</button>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-600 mb-1">Spayed/Neutered</label>
+                            <div class="flex gap-2" data-pref="spayed">
+                                <button type="button" class="pill" data-value="true">Yes</button>
+                                <button type="button" class="pill" data-value="false">No</button>
+                                <button type="button" class="pill" data-value="null">No Preference</button>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-600 mb-1">Open to Special Needs</label>
+                            <div class="flex gap-2" data-pref="specialNeeds">
+                                <button type="button" class="pill" data-value="true">Yes</button>
+                                <button type="button" class="pill" data-value="false">No</button>
+                                <button type="button" class="pill" data-value="null">No Preference</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Age Range -->
+                <div class="mt-6">
+                    <div class="flex justify-between items-center mb-1">
+                        <label class="text-sm font-medium text-gray-700">Preferred Age Range</label>
+                        <button type="button" class="text-xs text-orange-500 hover:underline" onclick="resetAgeSlider()">Reset</button>
+                    </div>
+                    <div id="ageSlider" class="mt-3"></div>
+                    <div class="flex justify-between text-sm text-gray-600 mt-1">
+                        <span id="ageMinLabel">1 month</span>
+                        <span id="ageMaxLabel">25 years</span>
+                    </div>
+                </div>
+
+                <p id="errorText" class="text-sm text-red-600 hidden"></p>
+
+                <div class="flex justify-between">
+                    <button type="button" onclick="clearAll()" class="text-sm text-orange-500 underline">Clear All</button>
+                    <button type="submit" class="bg-orange-500 hover:bg-orange-600 text-white py-3 px-6 rounded-md font-semibold transition duration-200">Save Preferences</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</section>
+
+<!-- Modal -->
+<div id="customModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+  <div class="bg-white rounded-xl shadow-lg max-w-sm w-full p-6">
+    <div id="modalMessage" class="text-gray-800 text-sm mb-4">This is a message.</div>
+    <div class="flex justify-end">
+      <button id="modalClose" class="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-md text-sm font-medium">
+        OK
+      </button>
+    </div>
+  </div>
+</div>
+
+
+<script src="https://cdn.jsdelivr.net/npm/nouislider@15.7.1/dist/nouislider.min.js"></script>
+<script>
+    function showModal(message) {
+    const modal = document.getElementById("customModal");
+    const modalMessage = document.getElementById("modalMessage");
+    const modalClose = document.getElementById("modalClose");
+
+    modalMessage.innerText = message;
+    modal.classList.remove("hidden");
+    modal.classList.add("flex");
+
+    function close() {
+      modal.classList.add("hidden");
+      modal.classList.remove("flex");
+      modalClose.removeEventListener("click", close);
+    }
+
+    modalClose.addEventListener("click", close);
+  }
+    const pillClass = "px-4 py-2 rounded-full border border-orange-400 text-orange-500 bg-white hover:bg-orange-100";
+    const selectedClass = "px-4 py-2 rounded-full border border-orange-500 text-white bg-orange-500";
+
+    function applySelectedStyle(btn) {
+        btn.classList.remove("bg-white", "text-orange-500", "hover:bg-orange-100");
+        btn.classList.add("bg-orange-500", "text-white", "selected");
+    }
+
+    function clearSelectedStyle(btn) {
+        btn.classList.remove("bg-orange-500", "text-white", "selected");
+        btn.classList.add("bg-white", "text-orange-500", "hover:bg-orange-100");
+    }
+
+    // Multi-select logic (Dog/Cat etc.)
+    document.querySelectorAll('[data-group="isDog"] .pill, [data-group="isMale"] .pill, [data-group="isAdopt"] .pill').forEach(btn => {
+        btn.className = "pill " + pillClass;
+        btn.addEventListener("click", () => {
+            if (btn.classList.contains("selected")) {
+                clearSelectedStyle(btn);
+            } else {
+                applySelectedStyle(btn);
+            }
+        });
+    });
+
+    // Tri-option logic (Vaccinated/Spayed/etc.)
+    document.querySelectorAll('[data-group="booleanPrefs"] [data-pref]').forEach(group => {
+        const buttons = group.querySelectorAll(".pill");
+        buttons.forEach(btn => {
+            btn.className = "pill " + pillClass;
+            btn.addEventListener("click", () => {
+                const isSelected = btn.classList.contains("selected");
+                buttons.forEach(clearSelectedStyle);
+                if (!isSelected) {
+                    applySelectedStyle(btn);
+                }
+            });
+        });
+    });
+
+    function clearGroup(group) {
+        document.querySelectorAll(`[data-group="${group}"] .pill`).forEach(clearSelectedStyle);
+    }
+
+    function clearAll() {
+        document.querySelectorAll(".pill").forEach(clearSelectedStyle);
+        document.getElementById("breed").value = "";
+        resetAgeSlider();
+    }
+
+    const slider = document.getElementById("ageSlider");
+    const ageMinLabel = document.getElementById("ageMinLabel");
+    const ageMaxLabel = document.getElementById("ageMaxLabel");
+
+    noUiSlider.create(slider, {
+        start: [1, 300],
+        connect: true,
+        step: 1,
+        range: {
+            min: 1,
+            max: 300
+        }
+    });
+
+    function formatMonths(m) {
+        const y = Math.floor(m / 12);
+        const rem = m % 12;
+        if (y === 0) return `${rem} month${rem > 1 ? "s" : ""}`;
+        if (rem === 0) return `${y} year${y > 1 ? "s" : ""}`;
+        return `${y} yr ${rem} mo`;
+    }
+
+    slider.noUiSlider.on('update', function (values) {
+        const [min, max] = values.map(v => Math.round(v));
+        ageMinLabel.textContent = formatMonths(min);
+        ageMaxLabel.textContent = formatMonths(max);
+    });
+
+    function resetAgeSlider() {
+        slider.noUiSlider.set([1, 300]);
+    }
+
+    function getTriOptionPrefs(groupSelector) {
+        const result = {};
+        document.querySelectorAll(`${groupSelector} [data-pref]`).forEach(group => {
+            const key = group.dataset.pref;
+            const selected = group.querySelector(".selected");
+            result[key] = selected ? (selected.dataset.value === "true" ? true : selected.dataset.value === "false" ? false : null) : null;
+        });
+        return result;
+    }
+
+    document.getElementById("preferencesForm").addEventListener("submit", async function (e) {
+        e.preventDefault();
+
+        const getSelectedValues = (group) => {
+            return Array.from(document.querySelectorAll(`[data-group="${group}"] .selected`)).map(btn =>
+                btn.dataset.value === "true" ? true : btn.dataset.value === "false" ? false : null
+            );
+        };
+
+        const getSelectedKeys = (group) => {
+            return Array.from(document.querySelectorAll(`[data-group="${group}"] .selected`)).map(btn => btn.dataset.key);
+        };
+
+        const isDogVals = getSelectedValues("isDog");
+        const isMaleVals = getSelectedValues("isMale");
+        const adoptKeys = getSelectedKeys("isAdopt");
+
+        const isDog = isDogVals.length === 1 ? isDogVals[0] : null;
+        const isMale = isMaleVals.length === 1 ? isMaleVals[0] : null;
+        let isAdopt = null;
+        if (adoptKeys.length === 1) {
+            isAdopt = adoptKeys[0] === "adopt" ? true : false;
+        }
+
+        const boolPrefs = getTriOptionPrefs('[data-group="booleanPrefs"]');
+        const [ageMin, ageMax] = slider.noUiSlider.get().map(v => Math.round(v));
+
+        const payload = {
+            isDog,
+            isMale,
+            isAdopt,
+            breed: document.getElementById("breed").value.trim() || null,
+            vaccinated: boolPrefs.vaccinated,
+            spayed: boolPrefs.spayed,
+            specialNeeds: boolPrefs.specialNeeds,
+            ageMin,
+            ageMax,
+        };
+
+        const breedRegex = /^[a-zA-Z\s\-]{2,50}$/;
+        if (payload.breed && !breedRegex.test(payload.breed)) {
+            return showError("Invalid breed. Use 2–50 letters, spaces or dashes.");
+        }
+        showModal("Saving preferences...");
+        try {
+            const res = await fetch("/preferences", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload)
+            });
+
+            const data = await res.json();
+            if (res.ok) {
+                showModal(data.message || "Preferences saved!");
+                window.location.href = "/home";
+            } else {
+                showError(data?.error || "Something went wrong.");
+            }
+        } catch (err) {
+            console.error(err);
+            showError("Network error.");
+        }
+    });
+
+    function showError(msg) {
+        const errorText = document.getElementById("errorText");
+        errorText.textContent = msg;
+        errorText.classList.remove("hidden");
+    }
+</script>
+</body>
+</html>

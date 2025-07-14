@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OTP Verification</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body>
+    <div class="max-w-md mx-auto mt-10 p-8 bg-white rounded-lg shadow-md">
+  <h2 class="text-2xl font-bold mb-6 text-center text-gray-800">Enter OTP</h2>
+  <p class="text-sm text-gray-600 mb-4 text-center">
+    Please enter the 6-digit OTP sent to your email to continue.
+  </p>
+
+  <form id="otpForm" class="space-y-4">
+    <input
+      id="otp_field"
+      type="text"
+      maxlength="6"
+      inputmode="numeric"
+      placeholder="Enter 6-digit OTP"
+      class="w-full px-4 py-3 rounded-md bg-white border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-orange-400"
+    />
+
+    <!-- Password fields for reset purpose -->
+    <div id="passwordFields" class="space-y-4" style="display: none;">
+      <input
+        id="newPassword"
+        type="password"
+        placeholder="Enter new password"
+        class="w-full px-4 py-3 rounded-md bg-white border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-orange-400"
+      />
+      <input
+        id="confirmPassword"
+        type="password"
+        placeholder="Confirm new password"
+        class="w-full px-4 py-3 rounded-md bg-white border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-orange-400"
+      />
+    </div>
+
+    <button
+      type="submit"
+      class="w-full bg-orange-500 hover:bg-orange-600 text-white py-3 rounded-md font-semibold transition duration-200"
+    >
+      <span id="submitText">Verify OTP</span>
+    </button>
+  </form>
+
+  <div class="text-center mt-4">
+    <button
+      id="resendOtp"
+      class="text-orange-500 hover:text-orange-600 text-sm font-medium"
+    >
+      Resend OTP
+    </button>
+  </div>
+
+  <div id="otpStatus" class="text-center mt-4 text-sm text-gray-700"></div>
+</div>
+
+<script>
+  const otpForm = document.getElementById("otpForm");
+  const otpInput = document.getElementById("otp_field");
+  const otpStatus = document.getElementById("otpStatus");
+  const passwordFields = document.getElementById("passwordFields");
+  const newPasswordInput = document.getElementById("newPassword");
+  const confirmPasswordInput = document.getElementById("confirmPassword");
+  const submitText = document.getElementById("submitText");
+
+  // Fill these from session/localStorage or server-side rendering
+  const email = sessionStorage.getItem("email");
+  const purpose = sessionStorage.getItem("otpPurpose"); // "reset" or "login"
+
+  // Show password fields if purpose is reset
+  if (purpose === "reset") {
+    passwordFields.style.display = "block";
+    submitText.textContent = "Reset Password";
+    document.querySelector("h2").textContent = "Reset Password";
+    document.querySelector("p").textContent = "Enter the OTP and your new password to reset your account.";
+  }
+
+  otpForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const code = otpInput.value.trim();
+    if (code.length !== 6) {
+      otpStatus.textContent = "Please enter a valid 6-digit OTP.";
+      return;
+    }
+
+    // Validate password fields if purpose is reset
+    if (purpose === "reset") {
+      const newPassword = newPasswordInput.value.trim();
+      const confirmPassword = confirmPasswordInput.value.trim();
+
+      if (!newPassword) {
+        otpStatus.textContent = "Please enter a new password.";
+        return;
+      }
+
+      if (newPassword.length < 8) {
+        otpStatus.textContent = "Password must be at least 8 characters long.";
+        return;
+      }
+
+      if (newPassword !== confirmPassword) {
+        otpStatus.textContent = "Passwords do not match.";
+        return;
+      }
+    }
+
+    try {
+      const requestBody = { email, code, purpose };
+      
+      // Add new password to request if purpose is reset
+      if (purpose === "reset") {
+        requestBody.newPassword = newPasswordInput.value.trim();
+      }
+
+      const res = await fetch("/verify-otp", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(requestBody)
+      });
+
+      const data = await res.json();
+      if (res.ok) {
+        if (purpose === "reset") {
+          otpStatus.textContent = "✅ Password reset successfully!";
+        } else {
+          otpStatus.textContent = "✅ Verified successfully!";
+        }
+        
+        // Redirect based on context
+        setTimeout(() => {
+          if (purpose === "reset") {
+            window.location.href = "/login"; // Redirect to login after password reset
+          } else {
+            window.location.href = "/home"; // Or home page
+          }
+        }, 1000);
+      } else {
+        otpStatus.textContent = "❌ " + (data.error || "Invalid or expired OTP.");
+      }
+    } catch (err) {
+      otpStatus.textContent = "❌ Something went wrong.";
+    }
+  });
+
+  document.getElementById("resendOtp").addEventListener("click", async () => {
+    otpStatus.textContent = "Resending...";
+
+    try {
+      const res = await fetch("/resend-otp", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, purpose })
+      });
+
+      const data = await res.json();
+      otpStatus.textContent = res.ok ? "📧 OTP resent!" : "❌ " + (data.error || "Failed to resend.");
+    } catch {
+      otpStatus.textContent = "❌ Network error.";
+    }
+  });
+</script>
+</body>
+</html>

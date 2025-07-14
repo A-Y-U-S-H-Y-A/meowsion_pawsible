@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Put Up Animal for Adoption</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
+
+    <style>
+        [draggable] {
+            user-select: none;
+        }
+
+        [draggable]:active {
+            opacity: 0.6;
+        }
+    </style>
+</head>
+
+<body class="bg-gray-50 overflow-x-hidden">
+    <section class="min-h-screen w-full flex justify-center px-4 py-8">
+        <form id="animalForm" class="bg-white w-full max-w-2xl p-6 md:p-8 rounded-lg shadow space-y-6">
+            <h2 class="text-xl font-semibold text-center">Add Animal for Adoption / Fostering</h2>
+            <input type="hidden" name="id" value="<%= animal?.id || '' %>" />
+
+            <!-- Name -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700">Name</label>
+                <input type="text" name="name" required placeholder="Animal Name"
+                    class="mt-1 w-full p-3 border rounded-md" value="<%= animal?.name || '' %>" />
+            </div>
+
+            <!-- Image Upload -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Upload Images (max 3)</label>
+                <div id="imagePreviewContainer" class="flex gap-3 flex-wrap">
+                    <!-- Thumbnails go here -->
+                    <button type="button" id="addImageBtn"
+                        class="w-24 h-24 border-2 border-dashed rounded-md flex items-center justify-center text-gray-400 hover:text-orange-500">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" stroke="currentColor"
+                            stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+                        </svg>
+                    </button>
+                </div>
+                <input type="file" accept="image/*" id="imageInput" class="hidden" />
+            </div>
+
+            <!-- Birthday -->
+            <div>
+                <% let birthdayFormatted='' ; %>
+                    <% if (animal?.birthday && typeof animal.birthday==='string' ) { birthdayFormatted=new
+                        Date(animal.birthday).toISOString().split('T')[0]; } else if (animal?.birthday?.toISOString) {
+                        birthdayFormatted=animal.birthday.toISOString().split('T')[0]; } %>
+
+
+
+                        <label class="block text-sm font-medium text-gray-700">Birthday</label>
+                        <input type="date" name="birthday" value="<%= birthdayFormatted %>" required
+                            class="mt-1 w-full p-3 border rounded-md" />
+            </div>
+
+            <!-- Boolean Pills -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm mb-1">Species</label>
+                    <div class="flex gap-2" data-group="isDog">
+                        <button type="button"
+                            class="pill <%= animal?.isDog === true ? 'bg-orange-500 text-white selected' : '' %>"
+                            data-value="true">Dog</button>
+                        <button type="button"
+                            class="pill <%= animal?.isDog === false ? 'bg-orange-500 text-white selected' : '' %>"
+                            data-value="false">Cat</button>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm mb-1">Gender</label>
+                    <div class="flex gap-2" data-group="isMale">
+                        <button type="button"
+                            class="pill <%= animal?.isMale === true ? 'bg-orange-500 text-white selected' : '' %>"
+                            data-value="true">Male</button>
+                        <button type="button"
+                            class="pill <%= animal?.isMale === false ? 'bg-orange-500 text-white selected' : '' %>"
+                            data-value="false">Female</button>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm mb-1">Vaccinated</label>
+                    <div class="flex gap-2" data-group="isVaccinated">
+                        <button type="button"
+                            class="pill <%= animal?.isVaccinated === true ? 'bg-orange-500 text-white selected' : '' %>"
+                            data-value="true">Yes</button>
+                        <button type="button"
+                            class="pill <%= animal?.isVaccinated === false ? 'bg-orange-500 text-white selected' : '' %>"
+                            data-value="false">No</button>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm mb-1">Spayed/Neutered</label>
+                    <div class="flex gap-2" data-group="isSpayed">
+                        <button type="button"
+                            class="pill <%= animal?.isSpayed === true ? 'bg-orange-500 text-white selected' : '' %>"
+                            data-value="true">Yes</button>
+                        <button type="button"
+                            class="pill <%= animal?.isSpayed === false ? 'bg-orange-500 text-white selected' : '' %>"
+                            data-value="false">No</button>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm mb-1">Special Needs?</label>
+                    <div class="flex gap-2" data-group="specialneeds">
+                        <button type="button"
+                            class="pill <%= animal?.specialneeds === true ? 'bg-orange-500 text-white selected' : '' %>"
+                            data-value="true">Yes</button>
+                        <button type="button"
+                            class="pill <%= animal?.specialneeds === false ? 'bg-orange-500 text-white selected' : '' %>"
+                            data-value="false">No</button>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm mb-1">Type</label>
+                    <div class="flex gap-2" data-group="house">
+                        <button type="button"
+                            class="pill <%= animal?.house === true ? 'bg-orange-500 text-white selected' : '' %>"
+                            data-value="true">Adoption</button>
+                        <button type="button"
+                            class="pill <%= animal?.house === false ? 'bg-orange-500 text-white selected' : '' %>"
+                            data-value="false">Fostering</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Special Needs Detail -->
+            <div id="specialNeedsDetails" class="hidden">
+                <label class="block text-sm font-medium text-gray-700 mt-4">Special Needs Description</label>
+                <input type="text" name="SN" value="<%= animal?.SN || '' %>" placeholder="Describe needs..."
+                    class="mt-1 w-full p-3 border rounded-md" />
+            </div>
+
+            <!-- Location & Breed -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Location</label>
+                    <input type="text" value="<%= animal?.location || '' %>" name="location" required
+                        class="mt-1 w-full p-3 border rounded-md" />
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Breed</label>
+                    <input type="text" value="<%= animal?.breed || '' %>" name="breed" required
+                        class="mt-1 w-full p-3 border rounded-md" />
+                </div>
+            </div>
+
+            <!-- Bio -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700">Bio</label>
+                <textarea name="bio" required rows="4" placeholder="Write a short bio..."
+                    class="mt-1 w-full p-3 border rounded-md resize-none"><%= animal?.bio || '' %></textarea>
+            </div>
+
+            <!-- Adopted -->
+            <div class="<%= animal?.adopted !== undefined ? '' : 'hidden' %>">
+                <label class="block text-sm mb-1">Already Adopted?</label>
+                <div class="flex gap-2" data-group="adopted">
+                    <button type="button"
+                        class="pill <%= animal?.adopted === true ? 'bg-orange-500 text-white selected' : '' %>"
+                        data-value="true">Yes</button>
+                    <button type="button"
+                        class="pill <%= animal?.adopted === false ? 'bg-orange-500 text-white selected' : '' %>"
+                        data-value="false">No</button>
+                </div>
+            </div>
+
+
+
+
+            <div class="text-center">
+                <button type="submit"
+                    class="mt-4 bg-orange-500 hover:bg-orange-600 text-white font-semibold py-3 px-6 rounded-md">Submit</button>
+            </div>
+        </form>
+    </section>
+    <!-- Modal -->
+    <div id="customModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+        <div class="bg-white rounded-xl shadow-lg max-w-sm w-full p-6">
+            <div id="modalMessage" class="text-gray-800 text-sm mb-4">This is a message.</div>
+            <div class="flex justify-end">
+                <button id="modalClose"
+                    class="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-md text-sm font-medium">
+                    OK
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function showModal(message) {
+            const modal = document.getElementById("customModal");
+            const modalMessage = document.getElementById("modalMessage");
+            const modalClose = document.getElementById("modalClose");
+
+            modalMessage.innerText = message;
+            modal.classList.remove("hidden");
+            modal.classList.add("flex");
+
+            function close() {
+                modal.classList.add("hidden");
+                modal.classList.remove("flex");
+                modalClose.removeEventListener("click", close);
+            }
+
+            modalClose.addEventListener("click", close);
+        }
+    </script>
+
+    <script>
+
+        const maxImages = 3;
+        const imageInput = document.getElementById("imageInput");
+        const addImageBtn = document.getElementById("addImageBtn");
+        const container = document.getElementById("imagePreviewContainer");
+        let imageList = [];
+        let allBlobs = []; // Store all blobs for reordering
+
+        // Open cropper when user selects image
+        addImageBtn.addEventListener("click", () => {
+            if (imageList.length >= maxImages) return;
+            imageInput.click();
+        });
+
+        imageInput.addEventListener("change", () => {
+            const file = imageInput.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = () => openCropperModal(reader.result);
+            reader.readAsDataURL(file);
+        });
+
+        function openCropperModal(imageSrc) {
+            const modal = document.createElement("div");
+            modal.className = "fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 overflow-y-auto";
+
+
+            modal.innerHTML = `
+    <div class="bg-white p-4 rounded-md w-[90vw] max-w-md">
+      <div class="relative w-full aspect-square">
+        <img id="cropperImage" src="${imageSrc}" class="max-h-[60vh] object-contain mx-auto" />
+      </div>
+      <div class="flex justify-between mt-4">
+        <button class="zoomBtn text-sm px-3 py-1 bg-gray-200 rounded" data-zoom="-1">-</button>
+        <button class="zoomBtn text-sm px-3 py-1 bg-gray-200 rounded" data-zoom="1">+</button>
+        <div class="flex gap-2">
+          <button id="cancelCrop" class="text-sm px-3 py-1 bg-gray-300 rounded">Cancel</button>
+          <button id="confirmCrop" class="text-sm px-3 py-1 bg-orange-500 text-white rounded">Crop</button>
+        </div>
+      </div>
+    </div>
+  `;
+
+            document.body.appendChild(modal);
+
+            const cropper = new Cropper(modal.querySelector("#cropperImage"), {
+                aspectRatio: 1,
+                viewMode: 1,
+                minContainerWidth: 300,
+                minContainerHeight: 300
+            });
+
+            // Zoom buttons
+            modal.querySelectorAll(".zoomBtn").forEach(btn => {
+                btn.onclick = () => {
+                    const zoomAmount = parseFloat(btn.dataset.zoom) * 0.1;
+                    cropper.zoom(zoomAmount);
+                };
+            });
+
+            // Cancel button
+            modal.querySelector("#cancelCrop").onclick = () => {
+                cropper.destroy();
+                modal.remove();
+            };
+
+            // Confirm crop
+            modal.querySelector("#confirmCrop").onclick = () => {
+                const canvas = cropper.getCroppedCanvas({ width: 300, height: 300 });
+                canvas.toBlob(blob => {
+                    addImageToList(blob);
+                    cropper.destroy();
+                    modal.remove();
+                }, "image/jpeg", 0.95);
+            };
+        }
+
+        function addImageToList(blob) {
+            if (imageList.length >= maxImages) return;
+
+            const id = Date.now().toString() + Math.random().toString(36).substring(2);
+            blob._id = id;
+            console.log("[ADD] New image with ID:", id);
+
+            const url = URL.createObjectURL(blob);
+
+            const wrapper = document.createElement("div");
+            wrapper.className = "relative w-24 h-24 rounded overflow-hidden border cursor-move";
+            wrapper.setAttribute("draggable", true);
+            wrapper.dataset.id = id;
+
+            const img = document.createElement("img");
+            img.src = url;
+            img.className = "w-full h-full object-cover pointer-events-none";
+
+            const removeBtn = document.createElement("button");
+            removeBtn.innerHTML = "✕";
+            removeBtn.className = "absolute top-0 right-0 bg-black bg-opacity-50 text-white text-xs px-1 py-0.5 rounded-bl";
+            removeBtn.onclick = () => {
+                console.log("[REMOVE] Image removed with ID:", id);
+                imageList.splice(imageList.findIndex(b => b._id === id), 1);
+                allBlobs.splice(allBlobs.findIndex(b => b._id === id), 1);
+                wrapper.remove();
+                updateAddButtonVisibility();
+                console.log("[REMOVE] imageList after removal:", imageList.map(b => b._id));
+            };
+
+            // Drag Events
+            wrapper.addEventListener("dragstart", e => {
+                dragSrcEl = wrapper;
+                console.log("[DRAGSTART] Dragging ID:", wrapper.dataset.id);
+                e.dataTransfer.effectAllowed = "move";
+            });
+
+            wrapper.addEventListener("dragover", e => {
+                e.preventDefault();
+                e.dataTransfer.dropEffect = "move";
+            });
+
+            wrapper.addEventListener("drop", e => {
+                e.preventDefault();
+                const droppedOnId = wrapper.dataset.id;
+                const draggedId = dragSrcEl.dataset.id;
+                console.log(`[DROP] Dropped ${draggedId} on ${droppedOnId}`);
+
+                if (dragSrcEl === wrapper) return;
+
+                const children = Array.from(container.children).filter(c => c !== addImageBtn);
+                const srcIndex = children.indexOf(dragSrcEl);
+                const destIndex = children.indexOf(wrapper);
+
+                console.log(`[DROP] srcIndex: ${srcIndex}, destIndex: ${destIndex}`);
+
+                if (srcIndex < destIndex) {
+                    container.insertBefore(dragSrcEl, wrapper.nextSibling);
+                } else {
+                    container.insertBefore(dragSrcEl, wrapper);
+                }
+
+                const idsInDomOrder = Array.from(container.children)
+                    .filter(c => c !== addImageBtn)
+                    .map(div => div.dataset.id);
+
+                console.log("[REORDER] DOM order:", idsInDomOrder);
+
+                imageList.length = 0; // clear it
+                idsInDomOrder.forEach(id => {
+                    const blob = allBlobs.find(b => b._id === id);
+                    if (blob) imageList.push(blob);
+                });
+
+                console.log("[REORDER] imageList after reorder:", imageList.map(b => b._id));
+            });
+
+            wrapper.appendChild(img);
+            wrapper.appendChild(removeBtn);
+            container.insertBefore(wrapper, addImageBtn);
+
+            imageList.push(blob);
+            allBlobs.push(blob);
+
+            console.log("[ADD] imageList:", imageList.map(b => b._id));
+            updateAddButtonVisibility();
+        }
+
+        // Reorder functionality
+        let dragSrcEl = null;
+
+        container.addEventListener("dragstart", e => {
+            if (e.target.matches("[draggable]")) {
+                dragSrcEl = e.target;
+                e.dataTransfer.effectAllowed = "move";
+            }
+        });
+
+        container.addEventListener("dragover", e => {
+            e.preventDefault();
+            const target = e.target.closest("[draggable]");
+            if (target && target !== dragSrcEl) {
+                const bounding = target.getBoundingClientRect();
+                const offset = bounding.y + bounding.height / 2;
+                container.insertBefore(dragSrcEl, e.clientY < offset ? target : target.nextSibling);
+            }
+        });
+
+        container.addEventListener("drop", () => {
+            const idsInDomOrder = Array.from(container.querySelectorAll("[draggable]"))
+                .filter(div => div !== addImageBtn)
+                .map(div => div.dataset.id);
+
+            imageList = idsInDomOrder.map(id =>
+                imageList.find(blob => blob._id === id)
+            );
+        });
+
+
+        function updateAddButtonVisibility() {
+            addImageBtn.style.display = imageList.length >= maxImages ? "none" : "flex";
+        }
+    </script>
+
+    <script>
+        // Initialize pills - run this after DOM is loaded
+        document.addEventListener("DOMContentLoaded", () => {
+            const selectedClasses = ["bg-orange-500", "text-white", "selected"];
+            const baseClasses = ["px-4", "py-2", "rounded-full", "border", "border-orange-400"];
+            const unselectedClasses = ["text-orange-500", "bg-white", "hover:bg-orange-100"];
+
+            // Initialize all pills
+            document.querySelectorAll(".pill").forEach(btn => {
+                // Add base classes to all pills
+                btn.classList.add(...baseClasses);
+
+                // If not already selected, add unselected styling
+                if (!btn.classList.contains("selected")) {
+                    btn.classList.add(...unselectedClasses);
+                }
+
+                // Add click event listener
+                btn.addEventListener("click", () => {
+                    const group = btn.closest("[data-group]").dataset.group;
+
+                    // Unselect all pills in the group
+                    document.querySelectorAll(`[data-group="${group}"] .pill`).forEach(b => {
+                        // Remove selected classes
+                        selectedClasses.forEach(cls => b.classList.remove(cls));
+                        // Add unselected classes
+                        b.classList.add(...unselectedClasses);
+                    });
+
+                    // Select the clicked pill
+                    btn.classList.remove(...unselectedClasses);
+                    btn.classList.add(...selectedClasses);
+
+                    // Show/hide Special Needs detail field
+                    if (group === "specialneeds") {
+                        const showSN = btn.dataset.value === "true";
+                        document.getElementById("specialNeedsDetails").classList.toggle("hidden", !showSN);
+                    }
+                });
+            });
+
+            // Initialize special needs field visibility on page load
+            const specialNeedsSelected = document.querySelector(`[data-group="specialneeds"] .selected`);
+            if (specialNeedsSelected && specialNeedsSelected.dataset.value === "true") {
+                document.getElementById("specialNeedsDetails").classList.remove("hidden");
+            }
+        });
+    </script>
+    <script>
+        document.getElementById("animalForm").addEventListener("submit", async function (e) {
+            e.preventDefault();
+
+            const form = e.target;
+            const formData = new FormData(form);
+
+            // Extract pill selections
+            ["isDog", "isMale", "isVaccinated", "isSpayed", "specialneeds", "house", "adopted"].forEach(key => {
+                const selected = document.querySelector(`[data-group="${key}"] .selected`);
+                if (selected) formData.set(key, selected.dataset.value);
+            });
+
+            // Convert imageList (cropped blobs) to base64 URLs
+            if (imageList.length < 1 || imageList.length > 3) {
+                showModal("Please upload between 1 and 3 images.");
+                return;
+            }
+
+            const imageBase64Array = await Promise.all(imageList.map(blob => {
+                return new Promise((resolve) => {
+                    const reader = new FileReader();
+                    reader.onloadend = () => resolve(reader.result); // base64 string
+                    reader.readAsDataURL(blob);
+                });
+            }));
+
+            // Construct final JSON payload
+            const payload = {
+                id: formData.get("id") || null, // For editing existing animals
+                name: formData.get("name"),
+                birthday: formData.get("birthday"),
+                isDog: formData.get("isDog") === "true",
+                isMale: formData.get("isMale") === "true",
+                isVaccinated: formData.get("isVaccinated") === "true",
+                isSpayed: formData.get("isSpayed") === "true",
+                specialneeds: formData.get("specialneeds") === "true",
+                SN: formData.get("SN") || null,
+                location: formData.get("location"),
+                breed: formData.get("breed"),
+                bio: formData.get("bio"),
+                house: formData.get("house") === "true",
+                adopted: formData.get("adopted") === "true",
+                image: imageBase64Array,
+            };
+            showModal("Submitting animal...");
+
+            try {
+                const res = await fetch("/animal", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                const result = await res.json();
+                if (res.ok) {
+                    showModal("Animal submitted successfully!");
+                    window.location.href = "/home"; // or wherever you want to redirect
+                } else {
+                    console.error(result);
+                    showModal("Failed to submit animal.");
+                }
+            } catch (err) {
+                console.error(err);
+                showModal("Error submitting form.");
+            }
+        });
+    </script>
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const existingImages = <%- JSON.stringify(animal?.images || []) %>;
+
+            existingImages.forEach((img, index) => {
+                fetch(img.url)
+                    .then(res => res.blob())
+                    .then(blob => {
+                        // Pre-assign an ID (optional, but keeps your reorder logic working)
+                        blob._id = `${Date.now()}_pre_${index}`;
+                        addImageToList(blob);
+                    })
+                    .catch(err => {
+                        console.error("Error preloading image:", img.url, err);
+                    });
+            });
+        });
+
+    </script>
+
+
+</body>
+
+</html>

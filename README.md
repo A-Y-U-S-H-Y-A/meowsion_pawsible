@@ -1,5 +1,5 @@
 # 🐾 Meowsion Pawsible
-A full-featured, secure **Express.js** pet adoption platform for finding and adopting pets. With smart matching, image handling, and location-based filtering, this platform connects people with their future companions — beautifully and efficiently.
+A gamified full-featured, secure **Express.js** pet adoption platform for finding and adopting pets. With smart matching, image handling, and location-based filtering, this platform connects people with their future companions — beautifully and efficiently.
 
 ---
 
