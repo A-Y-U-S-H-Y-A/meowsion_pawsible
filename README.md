@@ -40,8 +40,8 @@ SESSIONSECRET=
 
 Run the following commands
 ```bash
-git clone https://github.com/your-username/pet-adoption-platform.git
-cd pet-adoption-platform
+git clone https://github.com/A-Y-U-S-H-Y-A/meowsion_pawsible.git
+cd meowsion_pawsible
 # Copy the env in the current directory
 docker-compose up --build
 ````
