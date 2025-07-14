@@ -1001,7 +1001,7 @@
     async function adopt() {
       const pet = animalCards[currentCard];
       if (!pet) return;
-      showModal(`You have adopted ${pet.name}!`);
+      showModal(`Thank you for showing your interest in ${pet.name}! The owner will get in touch soon`);
       await registerInteraction(pet.id, 'adopt');
       animateSwipe("right");
     }
@@ -1009,7 +1009,6 @@
     async function reject() {
       const pet = animalCards[currentCard];
       if (!pet) return;
-      showModal(`You have rejected ${pet.name}.`);
       await registerInteraction(pet.id, 'reject');
       animateSwipe("left");
     }
